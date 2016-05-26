@@ -69,9 +69,16 @@ def create_data_frame(path):
     for col in ['Connection Secure', 'Connection Secure (Banking)']:
         df[col] = df[col].apply(lambda x: verification_scale[x])
 
+    df['Total'] = df['Question 1'] + df['Question 2'] + df['Question 3'] + df['Question 4'] + df['Question 5'] + df['Question 6']
+
     log.info('Finished importing, [%d] rows to DataFrame', df.shape[0])
-    log.debug("\n%s",df[['Gender','Age','Usage']].head())
+    log.debug("\n%s",df[['Gender','Age','Usage','Total']].head())
     return df
+
+def create_total_score_graph(df):
+    plot = df[['Age','Total']].sort('Total').plot(kind='barh')
+    save_figure(plot,'total_score')
+    log.info('Generated total_score graph')
 
 def create_demographic_graph(df):
     group = df[["Gender","Age"]].groupby(['Gender','Age']).size()
@@ -101,6 +108,7 @@ def main():
     df = create_data_frame(args.data)
 
     # Create charts
+    create_total_score_graph(df)
     create_demographic_graph(df)
     create_secure_usage_graph(df)
 
