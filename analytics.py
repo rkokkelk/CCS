@@ -16,6 +16,7 @@ import pprint
 
 import pandas as pd
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 
 import logging
@@ -26,6 +27,7 @@ pp = pprint.PrettyPrinter(indent=4)
 log = logging.getLogger("Analytics")
 
 # Configurations
+matplotlib.style.use('ggplot')
 pd.set_option('display.width', 300)
 pd.set_option('display.max_columns', 10)
 
@@ -73,9 +75,19 @@ def create_data_frame(path):
 
 def create_demographic_graph(df):
     group = df[["Gender","Age"]].groupby(['Gender','Age']).size()
-    plot = group.plot(kind="pie")
+    plot = group.plot(kind="pie",autopct='%d')
     save_figure(plot, "demographic")
     log.info("Generated Demographic chart")
+
+def create_secure_usage_graph(df):
+    data = pd.crosstab(df['Age'],df['Connection Secure'])
+    plot = data.plot(kind='barh',stacked=True)
+    save_figure(plot, 'verifying_connection')
+
+    data = pd.crosstab(df['Age'],df['Connection Secure (Banking)'])
+    plot = data.plot(kind='barh',stacked=True)
+    save_figure(plot, 'verifying_connection_banking')
+    log.info('Generated Secure connection graphs')
 
 def save_figure(plot, name):
     fig = plot.get_figure()
@@ -90,6 +102,7 @@ def main():
 
     # Create charts
     create_demographic_graph(df)
+    create_secure_usage_graph(df)
 
     log.info("Analytics ended")
 
