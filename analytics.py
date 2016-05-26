@@ -76,8 +76,15 @@ def create_data_frame(path):
     return df
 
 def create_total_score_graph(df):
-    plot = df[['Age','Total']].sort('Total').plot(kind='barh')
+    plot = df[['Age','Total']].sort_values(by='Total').plot(kind='barh')
     save_figure(plot,'total_score')
+    log.info('Generated total_score graph')
+
+def create_questions_score_graph(df):
+    for q in range(1,6):
+        col = 'Question %d' % q
+        plot = df[['Age',col]].sort_values(by=col).plot(kind='barh')
+        save_figure(plot,col+'_score')
     log.info('Generated total_score graph')
 
 def create_demographic_graph(df):
@@ -110,6 +117,7 @@ def main():
     # Create charts
     create_total_score_graph(df)
     create_demographic_graph(df)
+    create_questions_score_graph(df)
     create_secure_usage_graph(df)
 
     log.info("Analytics ended")
