@@ -40,14 +40,6 @@ def setup_logging(debug):
         log.setLevel(logging.INFO)
         ch.setLevel(logging.INFO)
     log.addHandler(ch)
-try:
-    syslog = logging.handlers.SysLogHandler(address='/dev/log')
-    syslog.setLevel(logging.WARN)
-    syslog.setFormatter(formatter)
-    log.addHandler(syslog)
-
-except:
-	pass
 
 def setup_arguments():
     parser = argparse.ArgumentParser(description='Hacking Labs Observatory')
@@ -57,8 +49,33 @@ def setup_arguments():
     return parser.parse_args()
 
 def create_data_frame(path):
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, skiprows=6)
+
+    gender_scale = {'m':'Male','f':'Female'}
+    age_scale = {'a':'18-25', 'b':'26-35', 'c':'36-45', 'd':'46-55','e':'56-90'}
+    usage_scale = {'a':'Never', 'b':'Sometimes', 'c':'Often', 'd':'Very Often'}
+    verification_scale = {'a':'Yes, always','b':'Yes, sometimes','c':'Every now and then', 'd':'No never'}
+
+    # Set the appropiate columns to categories
+    for col in ["Gender","Age","Usage",'Connection Secure', 'Connection Secure (Banking)']:
+        df[col] = df[col].astype('category')
+
+    # Assign appropiate names for categories
+    df['Gender'] = df['Gender'].apply(lambda x: gender_scale[x])
+    df['Age'] = df['Age'].apply(lambda x: age_scale[x])
+    df['Usage'] = df['Usage'].apply(lambda x: usage_scale[x])
+    for col in ['Connection Secure', 'Connection Secure (Banking)']:
+        df[col] = df[col].apply(lambda x: verification_scale[x])
+
+    log.info('Finished importing, [%d] rows to DataFrame', df.shape[0])
+    log.debug("\n%s",df[['Gender','Age','Usage']].head())
     return df
+
+def create_demographic_graph(df):
+    group = df[["Gender","Age"]].groupby(['Gender','Age']).size()
+    plot = group.plot(kind="pie")
+    save_figure(plot, "demographic")
+    log.info("Generated Demographic chart")
 
 def save_figure(plot, name):
     fig = plot.get_figure()
@@ -67,13 +84,12 @@ def save_figure(plot, name):
 
 def main():
 
-    log.info("Hacking Labs Analytics started")
+    log.info("Cyber Crime Science Analytics started")
 
-    path = args.data
-    df = create_data_frame(path)
+    df = create_data_frame(args.data)
 
-    log.info('Finished importing, [%d] rows to DataFrame', df.shape[0])
-    print(df.head())
+    # Create charts
+    create_demographic_graph(df)
 
     log.info("Analytics ended")
 
