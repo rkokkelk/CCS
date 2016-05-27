@@ -72,7 +72,7 @@ def create_data_frame(path):
     df['Total'] = df['Question 1'] + df['Question 2'] + df['Question 3'] + df['Question 4'] + df['Question 5'] + df['Question 6']
 
     log.info('Finished importing, [%d] rows to DataFrame', df.shape[0])
-    log.debug("\n%s",df[['Gender','Age','Usage','Total']].head())
+    log.debug("\n%s",df[['Gender','Age','Usage','Total']])
     return df
 
 def create_total_score_graph(df):
@@ -81,9 +81,15 @@ def create_total_score_graph(df):
     log.info('Generated total_score graph')
 
 def create_questions_score_graph(df):
+    boolean_scale = {-1: 'Incorrect',1:'Correct'}
     for q in range(1,6):
         col = 'Question %d' % q
-        plot = df[['Age',col]].sort_values(by=col).plot(kind='barh')
+        df[col] = df[col].apply(lambda x: boolean_scale[x])
+        group = df[["Age",col]].groupby([col,'Age']).size()
+        group = group.unstack(level=0)
+        group = group.fillna(0)
+        log.debug("\n%s", group.head())
+        plot = group.plot(kind='barh',stacked=True,colors=['g','r'])
         save_figure(plot,col+'_score')
     log.info('Generated total_score graph')
 
