@@ -109,6 +109,15 @@ def create_secure_usage_graph(df):
     save_figure(plot, 'verifying_connection_banking')
     log.info('Generated Secure connection graphs')
 
+def create_overal_graph(df):
+    df2 = df
+    df2['total_security'] = df2['Padlock']+df2['Internet Safety']
+    pivot = pd.pivot_table(df2,index=['total_security','Total'])
+    log.debug("\n%s",pivot)
+    plot = pivot.plot(kind='scatter',x='total_security',y='Total')
+    save_figure(plot, 'scatter_total_score')
+    log.info('Generated scattered total score')
+
 def save_figure(plot, name):
     fig = plot.get_figure()
     fig.savefig(os.path.join(args.result, name))
@@ -121,6 +130,7 @@ def main():
     df = create_data_frame(args.data)
 
     # Create charts
+    create_overal_graph(df)
     create_total_score_graph(df)
     create_demographic_graph(df)
     create_questions_score_graph(df)
