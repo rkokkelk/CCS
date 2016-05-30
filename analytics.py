@@ -115,12 +115,12 @@ def create_secure_usage_graph(df):
     log.info('Generated Secure connection graphs')
 
 def create_overal_graph(df):
-    df2 = df
-    df2['total_security'] = df2['Padlock']+df2['Internet Safety']
-    #pivot = pd.pivot_table(df2,index=['total_security','Total'])
-    #log.debug("\n%s",pivot)
-    #plot = pivot.plot(kind='scatter',x='total_security',y='Total')
-    #save_figure(plot, 'scatter_total_score')
+    df2 = df[['Total']]
+    df2['total_security'] = df['Padlock']+df['Internet Safety']
+    df2 = df2.groupby(['total_security','Total']).size().reset_index(name='Count')
+    log.debug("\n%s",df2)
+    plot = df2.plot(kind='scatter',x='total_security',y='Total',s=df2['Count']*150)
+    save_figure(plot, 'scatter_total_score')
     log.info('Generated scattered total score')
 
 def save_figure(plot, name):
