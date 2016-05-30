@@ -90,7 +90,7 @@ def create_questions_score_graph(df):
         group = df[["Age",col]].groupby([col,'Age']).size()
         group = group.unstack(level=0)
         group = group.fillna(0)
-        plot = group.plot(kind='barh',stacked=True,colors=[colors['g'],colors['r']])
+        plot = group.plot(kind='barh',stacked=True)
         save_figure(plot,col+'_score')
     log.info('Generated total_score graph')
 
@@ -103,11 +103,11 @@ def create_demographic_graph(df):
 
 def create_secure_usage_graph(df):
     data = pd.crosstab(df['Age'],df['Connection Secure'])
-    plot = data.plot(kind='barh',stacked=True,color=[colors['g'],colors['b'],colors['y'],colors['r']])
+    plot = data.plot(kind='barh',stacked=True)
     save_figure(plot, 'verifying_connection')
 
     data = pd.crosstab(df['Age'],df['Connection Secure (Banking)'])
-    plot = data.plot(kind='barh',stacked=True,color=[colors['g'],colors['b'],colors['y'],colors['r']])
+    plot = data.plot(kind='barh',stacked=True)
     save_figure(plot, 'verifying_connection_banking')
     log.info('Generated Secure connection graphs')
 
