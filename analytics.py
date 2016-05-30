@@ -89,33 +89,37 @@ def create_questions_score_graph(df):
         group = group.unstack(level=0)
         group = group.fillna(0)
         log.debug("\n%s", group.head())
-        plot = group.plot(kind='barh',stacked=True,colors=['g','r'])
+        if q == 1:
+            plot = group.plot(kind='barh',stacked=True,colors=['g','g','g','g','r'])
+        else:
+            plot = group.plot(kind='barh',stacked=True,colors=['g','r'])
         save_figure(plot,col+'_score')
     log.info('Generated total_score graph')
 
 def create_demographic_graph(df):
     group = df[["Gender","Age"]].groupby(['Gender','Age']).size()
     plot = group.plot(kind="pie",autopct='%d')
+    log.debug("\n%s", group)
     save_figure(plot, "demographic")
     log.info("Generated Demographic chart")
 
 def create_secure_usage_graph(df):
     data = pd.crosstab(df['Age'],df['Connection Secure'])
-    plot = data.plot(kind='barh',stacked=True)
+    plot = data.plot(kind='barh',stacked=True,color=['g','r','b','y'])
     save_figure(plot, 'verifying_connection')
 
     data = pd.crosstab(df['Age'],df['Connection Secure (Banking)'])
-    plot = data.plot(kind='barh',stacked=True)
+    plot = data.plot(kind='barh',stacked=True,color=['g','b','y'])
     save_figure(plot, 'verifying_connection_banking')
     log.info('Generated Secure connection graphs')
 
 def create_overal_graph(df):
     df2 = df
     df2['total_security'] = df2['Padlock']+df2['Internet Safety']
-    pivot = pd.pivot_table(df2,index=['total_security','Total'])
-    log.debug("\n%s",pivot)
-    plot = pivot.plot(kind='scatter',x='total_security',y='Total')
-    save_figure(plot, 'scatter_total_score')
+    #pivot = pd.pivot_table(df2,index=['total_security','Total'])
+    #log.debug("\n%s",pivot)
+    #plot = pivot.plot(kind='scatter',x='total_security',y='Total')
+    #save_figure(plot, 'scatter_total_score')
     log.info('Generated scattered total score')
 
 def save_figure(plot, name):
@@ -130,9 +134,9 @@ def main():
     df = create_data_frame(args.data)
 
     # Create charts
+    create_demographic_graph(df)
     create_overal_graph(df)
     create_total_score_graph(df)
-    create_demographic_graph(df)
     create_questions_score_graph(df)
     create_secure_usage_graph(df)
 
