@@ -31,6 +31,8 @@ matplotlib.style.use('ggplot')
 pd.set_option('display.width', 300)
 pd.set_option('display.max_columns', 10)
 
+colors = {'g':'darksage','r':'orangered','b':'deepskyblue','y':'gold'}
+
 def setup_logging(debug):
     formatter = logging.Formatter("[%(asctime)s] (%(levelname)s) %(message)s")
     ch = logging.StreamHandler(sys.stdout)
@@ -88,11 +90,10 @@ def create_questions_score_graph(df):
         group = df[["Age",col]].groupby([col,'Age']).size()
         group = group.unstack(level=0)
         group = group.fillna(0)
-        log.debug("\n%s", group.head())
         if q == 1:
-            plot = group.plot(kind='barh',stacked=True,colors=['g','g','g','g','r'])
+            plot = group.plot(kind='barh',stacked=True,colors=[colors['g'],colors['g'],colors['g'],colors['g'],colors['r']])
         else:
-            plot = group.plot(kind='barh',stacked=True,colors=['g','r'])
+            plot = group.plot(kind='barh',stacked=True,colors=[colors['g'],colors['r']])
         save_figure(plot,col+'_score')
     log.info('Generated total_score graph')
 
@@ -105,11 +106,11 @@ def create_demographic_graph(df):
 
 def create_secure_usage_graph(df):
     data = pd.crosstab(df['Age'],df['Connection Secure'])
-    plot = data.plot(kind='barh',stacked=True,color=['g','r','b','y'])
+    plot = data.plot(kind='barh',stacked=True,color=[colors['g'],colors['b'],colors['y'],colors['r']])
     save_figure(plot, 'verifying_connection')
 
     data = pd.crosstab(df['Age'],df['Connection Secure (Banking)'])
-    plot = data.plot(kind='barh',stacked=True,color=['g','b','y'])
+    plot = data.plot(kind='barh',stacked=True,color=[colors['g'],colors['y'],colors['r']])
     save_figure(plot, 'verifying_connection_banking')
     log.info('Generated Secure connection graphs')
 
