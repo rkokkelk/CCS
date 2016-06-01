@@ -77,6 +77,12 @@ def create_data_frame(path):
     log.debug("\n%s",df[['Gender','Age','Usage','Total']])
     return df
 
+def create_total_score_gender_graph(df):
+    data = pd.crosstab(df['Gender'],df['Total'])
+    plot = data.plot(kind='bar')
+    save_figure(plot, 'score_gender')
+    log.info('Generated total gender usage')
+
 def create_total_score_graph(df):
     plot = df[['Age','Total']].sort_values(by='Total').plot(kind='barh')
     save_figure(plot,'total_score')
@@ -139,6 +145,7 @@ def main():
 
     # Create charts
     create_demographic_graph(df)
+    create_total_score_gender_graph(df)
     create_internet_usage(df)
     create_overal_graph(df)
     create_total_score_graph(df)
