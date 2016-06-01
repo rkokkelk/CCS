@@ -84,7 +84,7 @@ def create_total_score_graph(df):
 
 def create_questions_score_graph(df):
     boolean_scale = {-1: 'Incorrect',1:'Correct'}
-    for q in range(1,6):
+    for q in range(1,7):
         col = 'Question %d' % q
         df[col] = df[col].apply(lambda x: boolean_scale[x])
         group = df[["Age",col]].groupby([col,'Age']).size()
@@ -92,7 +92,7 @@ def create_questions_score_graph(df):
         group = group.fillna(0)
         plot = group.plot(kind='barh',stacked=True)
         save_figure(plot,col+'_score')
-    log.info('Generated total_score graph')
+    log.info('Generated questions score graph')
 
 def create_demographic_graph(df):
     group = df[["Gender","Age"]].groupby(['Gender','Age']).size()
@@ -100,6 +100,12 @@ def create_demographic_graph(df):
     log.debug("\n%s", group)
     save_figure(plot, "demographic")
     log.info("Generated Demographic chart")
+
+def create_internet_usage(df):
+    data = pd.crosstab(df['Age'],df['Usage'])
+    plot = data.plot(kind='barh',stacked=True)
+    save_figure(plot, 'internet_usage')
+    log.info('Generated internet usage')
 
 def create_secure_usage_graph(df):
     data = pd.crosstab(df['Age'],df['Connection Secure'])
@@ -133,6 +139,7 @@ def main():
 
     # Create charts
     create_demographic_graph(df)
+    create_internet_usage(df)
     create_overal_graph(df)
     create_total_score_graph(df)
     create_questions_score_graph(df)
